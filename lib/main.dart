@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_todo_app/screens/todo_list_screen.dart';
 
 void main() {
   runApp(const MainApp());
@@ -9,12 +10,17 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
+    return MaterialApp(
+      title: 'Todo App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        fontFamily: 'Hiragino Sans',
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color.fromARGB(255, 0, 138, 197),
         ),
+        textTheme: Theme.of(context).textTheme.apply(bodyColor: Colors.white),
       ),
+      home: const TodoListScreen(),
     );
   }
 }
