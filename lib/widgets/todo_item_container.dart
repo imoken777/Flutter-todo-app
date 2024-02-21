@@ -18,6 +18,13 @@ class _TodoItemContainerState extends State<TodoItemContainer> {
     setState(() {
       widget.todoItem.isCompleted = !widget.todoItem.isCompleted;
     });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          widget.todoItem.isCompleted ? 'タスクを完了しました' : 'タスクを未完了にしました',
+        ),
+      ),
+    );
   }
 
   @override

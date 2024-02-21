@@ -48,6 +48,11 @@ class _TodoListScreenState extends State<TodoListScreen> {
             setState(() {
               todoItems.add(result as TodoItem);
             });
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('タスクを追加しました'),
+              ),
+            );
           }
         },
         child: const Icon(Icons.add),
