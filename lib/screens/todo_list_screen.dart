@@ -13,6 +13,17 @@ class TodoListScreen extends StatefulWidget {
 class _TodoListScreenState extends State<TodoListScreen> {
   List<TodoItem> todoItems = [];
 
+  void _deleteTodoItem(int index) {
+    setState(() {
+      todoItems.removeAt(index);
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('タスクを削除しました'),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,7 +46,10 @@ class _TodoListScreenState extends State<TodoListScreen> {
                 : ListView.builder(
                     itemCount: todoItems.length,
                     itemBuilder: (context, index) {
-                      return TodoItemContainer(todoItem: todoItems[index]);
+                      return TodoItemContainer(
+                        todoItem: todoItems[index],
+                        onDelete: () => _deleteTodoItem(index),
+                      );
                     },
                   ),
           ),
