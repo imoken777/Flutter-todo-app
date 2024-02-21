@@ -7,5 +7,5 @@ class TodoItem {
 
   final String id;
   final String title;
-  final bool isCompleted;
+  bool isCompleted;
 }

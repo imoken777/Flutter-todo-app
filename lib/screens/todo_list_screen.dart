@@ -11,35 +11,46 @@ class TodoListScreen extends StatefulWidget {
 }
 
 class _TodoListScreenState extends State<TodoListScreen> {
+  List<TodoItem> todoItems = [];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Todo List'),
+        title: const Text('Todo リスト'),
       ),
       body: Column(
         children: [
-          const Padding(
-            padding: EdgeInsets.symmetric(
-              vertical: 12,
-              horizontal: 36,
-            ),
-          ),
-          TodoItemContainer(
-            todoItem: TodoItem(
-              id: '1',
-              title: 'Buy groceries',
-              isCompleted: false,
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: ((context) => const CreateTaskScreen())));
-            },
-            child: const Text('Create Task'),
+          Expanded(
+            child: todoItems.isEmpty
+                ? const Center(
+                    child: Text(
+                      'タスクがありません',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.black,
+                      ),
+                    ),
+                  )
+                : ListView.builder(
+                    itemCount: todoItems.length,
+                    itemBuilder: (context, index) {
+                      return TodoItemContainer(todoItem: todoItems[index]);
+                    },
+                  ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          final result = await Navigator.of(context).pushNamed('/create');
+          if (result != null) {
+            setState(() {
+              todoItems.add(result as TodoItem);
+            });
+          }
+        },
+        child: const Icon(Icons.add),
       ),
     );
   }

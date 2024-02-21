@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_todo_app/models/todo_item.dart';
 
 class CreateTaskScreen extends StatefulWidget {
   const CreateTaskScreen({super.key});
@@ -8,8 +9,31 @@ class CreateTaskScreen extends StatefulWidget {
 }
 
 class _CreateTaskScreenState extends State<CreateTaskScreen> {
-  String taskTitle = '';
+  late TodoItem todoItem;
+  late TextEditingController _todoInputController;
 
+  void initState() {
+    super.initState();
+    _todoInputController = TextEditingController();
+  }
+
+  void dispose() {
+    super.dispose();
+    _todoInputController.dispose();
+  }
+
+  void _createTodo() {
+    if (_todoInputController.text.length > 0) {
+      todoItem = TodoItem(
+          id: UniqueKey().toString(),
+          title: _todoInputController.text,
+          isCompleted: false);
+    }
+    _todoInputController.clear();
+    Navigator.of(context).pop(todoItem);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -24,19 +48,17 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
             ),
           ),
           TextField(
+            controller: _todoInputController,
+            autofocus: true,
+            onEditingComplete: _createTodo,
             style: const TextStyle(fontSize: 18, color: Colors.black),
             decoration: const InputDecoration(
               labelText: 'タスク名',
             ),
-            onSubmitted: (String value) {
-              setState(() {
-                taskTitle = value;
-              });
-            },
           ),
           const SizedBox(height: 20),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: _createTodo,
             child: const Text('タスク作成'),
           ),
         ],

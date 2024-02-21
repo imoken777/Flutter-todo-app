@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_todo_app/screens/create_task_screen.dart';
 import 'package:flutter_todo_app/screens/todo_list_screen.dart';
 
 void main() {
@@ -20,7 +21,11 @@ class MainApp extends StatelessWidget {
         ),
         textTheme: Theme.of(context).textTheme.apply(bodyColor: Colors.white),
       ),
-      home: const TodoListScreen(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const TodoListScreen(),
+        '/create': (context) => const CreateTaskScreen(),
+      },
     );
   }
 }
