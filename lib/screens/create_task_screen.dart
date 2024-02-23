@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_todo_app/isar_instace.dart';
 import 'package:flutter_todo_app/models/todo_item.dart';
 
 class CreateTaskScreen extends StatefulWidget {
@@ -12,25 +13,30 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
   late TodoItem todoItem;
   late TextEditingController _todoInputController;
 
+  @override
   void initState() {
     super.initState();
     _todoInputController = TextEditingController();
   }
 
+  @override
   void dispose() {
-    super.dispose();
     _todoInputController.dispose();
+    super.dispose();
   }
 
-  void _createTodo() {
-    if (_todoInputController.text.length > 0) {
-      todoItem = TodoItem(
-          id: UniqueKey().toString(),
-          title: _todoInputController.text,
-          isCompleted: false);
+  void _createTodo() async {
+    if (_todoInputController.text.isNotEmpty) {
+      final newTodo = TodoItem()
+        ..title = _todoInputController.text
+        ..isCompleted = false;
+
+      await isar.writeTxn(() async {
+        await isar.todoItems.put(newTodo);
+      });
     }
     _todoInputController.clear();
-    Navigator.of(context).pop(todoItem);
+    Navigator.of(context).pop(true);
   }
 
   @override

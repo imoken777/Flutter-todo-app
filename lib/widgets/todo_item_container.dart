@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_todo_app/isar_instace.dart';
 import 'package:flutter_todo_app/models/todo_item.dart';
+import 'package:isar/isar.dart';
 
 class TodoItemContainer extends StatefulWidget {
   final TodoItem todoItem;
-  final VoidCallback onDelete;
 
   const TodoItemContainer({
     super.key,
     required this.todoItem,
-    required this.onDelete,
   });
 
   @override
@@ -16,9 +16,24 @@ class TodoItemContainer extends StatefulWidget {
 }
 
 class _TodoItemContainerState extends State<TodoItemContainer> {
-  void _toggleTodo() {
+  late bool isCompleted;
+
+  @override
+  void initState() {
+    super.initState();
+    isCompleted = widget.todoItem.isCompleted;
+  }
+
+  void toggleTodo(Id id) async {
+    await isar.writeTxn(() async {
+      final todoItem = await isar.todoItems.get(id);
+      if (todoItem != null) {
+        todoItem.isCompleted = !todoItem.isCompleted;
+        await isar.todoItems.put(todoItem);
+      }
+    });
     setState(() {
-      widget.todoItem.isCompleted = !widget.todoItem.isCompleted;
+      isCompleted = !isCompleted;
     });
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -29,15 +44,30 @@ class _TodoItemContainerState extends State<TodoItemContainer> {
     );
   }
 
+  void deleteTodoItem(Id id) async {
+    await isar.writeTxn(() async {
+      final success = await isar.todoItems.delete(id);
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('タスクを削除しました'),
+          ),
+        );
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: _toggleTodo,
+      onTap: () {
+        toggleTodo(widget.todoItem.id);
+      },
       child: Dismissible(
-        key: Key(widget.todoItem.id),
+        key: Key(widget.todoItem.id.toString()),
         direction: DismissDirection.endToStart, //右から左へスワイプ
         onDismissed: (direction) {
-          widget.onDelete();
+          deleteTodoItem(widget.todoItem.id);
         },
         background: Container(
           color: Colors.red,
@@ -58,7 +88,7 @@ class _TodoItemContainerState extends State<TodoItemContainer> {
               vertical: 16,
             ),
             decoration: BoxDecoration(
-              color: widget.todoItem.isCompleted
+              color: isCompleted
                   ? Colors.green // タスク完了時の色
                   : Color.fromARGB(255, 0, 138, 197), // タスク未完了時の色
               borderRadius: const BorderRadius.all(
@@ -73,7 +103,7 @@ class _TodoItemContainerState extends State<TodoItemContainer> {
                   style: TextStyle(
                     fontSize: 18,
                     color: Colors.white,
-                    decoration: widget.todoItem.isCompleted
+                    decoration: isCompleted
                         ? TextDecoration.lineThrough
                         : TextDecoration.none,
                   ),

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_todo_app/isar_instace.dart';
 import 'package:flutter_todo_app/models/todo_item.dart';
 import 'package:flutter_todo_app/screens/create_task_screen.dart';
 import 'package:flutter_todo_app/widgets/todo_item_container.dart';
+import 'package:isar/isar.dart';
 
 class TodoListScreen extends StatefulWidget {
   const TodoListScreen({super.key});
@@ -11,17 +13,9 @@ class TodoListScreen extends StatefulWidget {
 }
 
 class _TodoListScreenState extends State<TodoListScreen> {
-  List<TodoItem> todoItems = [];
-
-  void _deleteTodoItem(int index) {
-    setState(() {
-      todoItems.removeAt(index);
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('タスクを削除しました'),
-      ),
-    );
+  Future<List<TodoItem>> getTodoItems() async {
+    final todoItems = await isar.todoItems.where().findAll();
+    return todoItems;
   }
 
   @override
@@ -33,35 +27,39 @@ class _TodoListScreenState extends State<TodoListScreen> {
       body: Column(
         children: [
           Expanded(
-            child: todoItems.isEmpty
-                ? const Center(
-                    child: Text(
-                      'タスクがありません',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.black,
-                      ),
-                    ),
-                  )
-                : ListView.builder(
-                    itemCount: todoItems.length,
-                    itemBuilder: (context, index) {
-                      return TodoItemContainer(
-                        todoItem: todoItems[index],
-                        onDelete: () => _deleteTodoItem(index),
+              child: FutureBuilder(
+                  future: getTodoItems(),
+                  builder: (context, snapShot) {
+                    if (snapShot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
                       );
-                    },
-                  ),
-          ),
+                    } else if (snapShot.hasError) {
+                      return const Center(
+                        child: Text('エラーが発生しました'),
+                      );
+                    } else if (snapShot.hasData) {
+                      final todoItems = snapShot.data as List<TodoItem>;
+                      return ListView.builder(
+                          itemCount: todoItems.length,
+                          itemBuilder: (context, index) {
+                            return TodoItemContainer(
+                              todoItem: todoItems[index],
+                            );
+                          });
+                    } else {
+                      return const Center(
+                        child: Text('データがありません'),
+                      );
+                    }
+                  })),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           final result = await Navigator.of(context).pushNamed('/create');
-          if (result != null) {
-            setState(() {
-              todoItems.add(result as TodoItem);
-            });
+          if (result != null && result == true) {
+            setState(() {});
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('タスクを追加しました'),
