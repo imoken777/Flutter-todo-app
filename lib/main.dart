@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_todo_app/isar_instace.dart';
+import 'package:flutter_todo_app/models/todo_item.dart';
 import 'package:flutter_todo_app/screens/create_task_screen.dart';
 import 'package:flutter_todo_app/screens/todo_list_screen.dart';
+import 'package:isar/isar.dart';
+import 'package:path_provider/path_provider.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeIsar();
   runApp(const MainApp());
 }
 

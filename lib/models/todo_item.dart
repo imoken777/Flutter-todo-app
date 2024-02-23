@@ -1,11 +1,10 @@
-class TodoItem {
-  TodoItem({
-    required this.id,
-    required this.title,
-    this.isCompleted = false,
-  });
+import 'package:isar/isar.dart';
 
-  final String id;
-  final String title;
-  bool isCompleted;
+part 'todo_item.g.dart';
+
+@Collection()
+class TodoItem {
+  Id id = Isar.autoIncrement;
+  String title = 'default title';
+  bool isCompleted = false;
 }
