@@ -17,13 +17,18 @@ const TodoItemSchema = CollectionSchema(
   name: r'TodoItem',
   id: 2911115524195791711,
   properties: {
-    r'isCompleted': PropertySchema(
+    r'deadline': PropertySchema(
       id: 0,
+      name: r'deadline',
+      type: IsarType.dateTime,
+    ),
+    r'isCompleted': PropertySchema(
+      id: 1,
       name: r'isCompleted',
       type: IsarType.bool,
     ),
     r'title': PropertySchema(
-      id: 1,
+      id: 2,
       name: r'title',
       type: IsarType.string,
     )
@@ -58,8 +63,9 @@ void _todoItemSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeBool(offsets[0], object.isCompleted);
-  writer.writeString(offsets[1], object.title);
+  writer.writeDateTime(offsets[0], object.deadline);
+  writer.writeBool(offsets[1], object.isCompleted);
+  writer.writeString(offsets[2], object.title);
 }
 
 TodoItem _todoItemDeserialize(
@@ -69,9 +75,10 @@ TodoItem _todoItemDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = TodoItem();
+  object.deadline = reader.readDateTime(offsets[0]);
   object.id = id;
-  object.isCompleted = reader.readBool(offsets[0]);
-  object.title = reader.readString(offsets[1]);
+  object.isCompleted = reader.readBool(offsets[1]);
+  object.title = reader.readString(offsets[2]);
   return object;
 }
 
@@ -83,8 +90,10 @@ P _todoItemDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readBool(offset)) as P;
+      return (reader.readDateTime(offset)) as P;
     case 1:
+      return (reader.readBool(offset)) as P;
+    case 2:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -180,6 +189,59 @@ extension TodoItemQueryWhere on QueryBuilder<TodoItem, TodoItem, QWhereClause> {
 
 extension TodoItemQueryFilter
     on QueryBuilder<TodoItem, TodoItem, QFilterCondition> {
+  QueryBuilder<TodoItem, TodoItem, QAfterFilterCondition> deadlineEqualTo(
+      DateTime value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'deadline',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<TodoItem, TodoItem, QAfterFilterCondition> deadlineGreaterThan(
+    DateTime value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'deadline',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<TodoItem, TodoItem, QAfterFilterCondition> deadlineLessThan(
+    DateTime value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'deadline',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<TodoItem, TodoItem, QAfterFilterCondition> deadlineBetween(
+    DateTime lower,
+    DateTime upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'deadline',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<TodoItem, TodoItem, QAfterFilterCondition> idEqualTo(Id value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -380,6 +442,18 @@ extension TodoItemQueryLinks
     on QueryBuilder<TodoItem, TodoItem, QFilterCondition> {}
 
 extension TodoItemQuerySortBy on QueryBuilder<TodoItem, TodoItem, QSortBy> {
+  QueryBuilder<TodoItem, TodoItem, QAfterSortBy> sortByDeadline() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'deadline', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TodoItem, TodoItem, QAfterSortBy> sortByDeadlineDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'deadline', Sort.desc);
+    });
+  }
+
   QueryBuilder<TodoItem, TodoItem, QAfterSortBy> sortByIsCompleted() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isCompleted', Sort.asc);
@@ -407,6 +481,18 @@ extension TodoItemQuerySortBy on QueryBuilder<TodoItem, TodoItem, QSortBy> {
 
 extension TodoItemQuerySortThenBy
     on QueryBuilder<TodoItem, TodoItem, QSortThenBy> {
+  QueryBuilder<TodoItem, TodoItem, QAfterSortBy> thenByDeadline() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'deadline', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TodoItem, TodoItem, QAfterSortBy> thenByDeadlineDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'deadline', Sort.desc);
+    });
+  }
+
   QueryBuilder<TodoItem, TodoItem, QAfterSortBy> thenById() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.asc);
@@ -446,6 +532,12 @@ extension TodoItemQuerySortThenBy
 
 extension TodoItemQueryWhereDistinct
     on QueryBuilder<TodoItem, TodoItem, QDistinct> {
+  QueryBuilder<TodoItem, TodoItem, QDistinct> distinctByDeadline() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'deadline');
+    });
+  }
+
   QueryBuilder<TodoItem, TodoItem, QDistinct> distinctByIsCompleted() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'isCompleted');
@@ -465,6 +557,12 @@ extension TodoItemQueryProperty
   QueryBuilder<TodoItem, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<TodoItem, DateTime, QQueryOperations> deadlineProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'deadline');
     });
   }
 

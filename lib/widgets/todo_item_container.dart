@@ -108,6 +108,13 @@ class _TodoItemContainerState extends State<TodoItemContainer> {
                         : TextDecoration.none,
                   ),
                 ),
+                Text(
+                  '締め切り日: ${widget.todoItem.deadline.year}/${widget.todoItem.deadline.month}/${widget.todoItem.deadline.day}',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.white,
+                  ),
+                )
               ],
             ),
           ),

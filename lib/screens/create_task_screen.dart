@@ -13,6 +13,8 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
   late TodoItem todoItem;
   late TextEditingController _todoInputController;
 
+  late DateTime _inputDate;
+
   @override
   void initState() {
     super.initState();
@@ -29,6 +31,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
     if (_todoInputController.text.isNotEmpty) {
       final newTodo = TodoItem()
         ..title = _todoInputController.text
+        ..deadline = _inputDate
         ..isCompleted = false;
 
       await isar.writeTxn(() async {
@@ -62,6 +65,9 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
               labelText: 'タスク名',
             ),
           ),
+          OutlinedButton(
+              onPressed: () => _openInputDateField(context),
+              child: const Text('締め切り日付選択')),
           const SizedBox(height: 20),
           ElevatedButton(
             onPressed: _createTodo,
@@ -70,5 +76,18 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _openInputDateField(BuildContext context) async {
+    final DateTime? _date = await showDatePicker(
+        context: context,
+        firstDate: DateTime.now(),
+        lastDate: DateTime(2100),
+        initialDate: DateTime.now());
+    if (_date != null) {
+      setState(() {
+        _inputDate = _date;
+      });
+    }
   }
 }
