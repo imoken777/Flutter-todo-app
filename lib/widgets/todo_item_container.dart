@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_todo_app/isar_instace.dart';
+import 'package:flutter_todo_app/isar_instance.dart';
 import 'package:flutter_todo_app/models/todo_item.dart';
 import 'package:isar/isar.dart';
 
