@@ -39,7 +39,9 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
       });
     }
     _todoInputController.clear();
-    Navigator.of(context).pop(true);
+    if (mounted) {
+      Navigator.of(context).pop(true);
+    }
   }
 
   @override
@@ -79,14 +81,14 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
   }
 
   Future<void> _openInputDateField(BuildContext context) async {
-    final DateTime? _date = await showDatePicker(
+    final DateTime? date = await showDatePicker(
         context: context,
         firstDate: DateTime.now(),
         lastDate: DateTime(2100),
         initialDate: DateTime.now());
-    if (_date != null) {
+    if (date != null) {
       setState(() {
-        _inputDate = _date;
+        _inputDate = date;
       });
     }
   }

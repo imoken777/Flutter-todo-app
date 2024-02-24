@@ -35,6 +35,7 @@ class _TodoItemContainerState extends State<TodoItemContainer> {
     setState(() {
       isCompleted = !isCompleted;
     });
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -47,7 +48,7 @@ class _TodoItemContainerState extends State<TodoItemContainer> {
   void deleteTodoItem(Id id) async {
     await isar.writeTxn(() async {
       final success = await isar.todoItems.delete(id);
-      if (success) {
+      if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('タスクを削除しました'),
@@ -71,9 +72,9 @@ class _TodoItemContainerState extends State<TodoItemContainer> {
         },
         background: Container(
           color: Colors.red,
-          child: const Icon(Icons.delete, color: Colors.white),
           alignment: Alignment.centerRight,
           padding: const EdgeInsets.only(right: 20),
+          child: const Icon(Icons.delete, color: Colors.white),
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(
@@ -90,7 +91,7 @@ class _TodoItemContainerState extends State<TodoItemContainer> {
             decoration: BoxDecoration(
               color: isCompleted
                   ? Colors.green // タスク完了時の色
-                  : Color.fromARGB(255, 0, 138, 197), // タスク未完了時の色
+                  : const Color.fromARGB(255, 0, 138, 197), // タスク未完了時の色
               borderRadius: const BorderRadius.all(
                 Radius.circular(20),
               ),

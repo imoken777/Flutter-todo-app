@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_todo_app/isar_instance.dart';
 import 'package:flutter_todo_app/models/todo_item.dart';
-import 'package:flutter_todo_app/screens/create_task_screen.dart';
 import 'package:flutter_todo_app/widgets/todo_item_container.dart';
 import 'package:isar/isar.dart';
 
@@ -89,7 +88,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           final result = await Navigator.of(context).pushNamed('/create');
-          if (result != null && result == true) {
+          if (result != null && result == true && mounted) {
             setState(() {});
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
