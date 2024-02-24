@@ -13,8 +13,20 @@ class TodoListScreen extends StatefulWidget {
 }
 
 class _TodoListScreenState extends State<TodoListScreen> {
-  Future<List<TodoItem>> getTodoItems() async {
-    final todoItems = await isar.todoItems.where().findAll();
+  bool showCompleted = false;
+
+  void toggleFilter(bool value) {
+    setState(() {
+      showCompleted = value;
+    });
+  }
+
+  Future<List<TodoItem>> getTodoItems(bool showCompleted) async {
+    final todoItems = await isar.todoItems
+        .filter()
+        .isCompletedEqualTo(showCompleted) //完了未完了のフィルター
+        .sortByDeadline()
+        .findAll();
     return todoItems;
   }
 
@@ -26,9 +38,28 @@ class _TodoListScreenState extends State<TodoListScreen> {
       ),
       body: Column(
         children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              const Text('完了済みのタスクを表示'),
+              DropdownButton<bool>(
+                value: showCompleted,
+                onChanged: (bool? newValue) {
+                  if (newValue != null) {
+                    toggleFilter(newValue);
+                  }
+                },
+                items: const [
+                  DropdownMenuItem(value: false, child: Text('未完了')),
+                  DropdownMenuItem(value: true, child: Text('完了'))
+                ],
+                style: TextStyle(color: Theme.of(context).primaryColor),
+              )
+            ],
+          ),
           Expanded(
               child: FutureBuilder(
-                  future: getTodoItems(),
+                  future: getTodoItems(showCompleted),
                   builder: (context, snapShot) {
                     if (snapShot.connectionState == ConnectionState.waiting) {
                       return const Center(

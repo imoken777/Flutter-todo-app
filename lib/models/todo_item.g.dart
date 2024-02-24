@@ -38,7 +38,21 @@ const TodoItemSchema = CollectionSchema(
   deserialize: _todoItemDeserialize,
   deserializeProp: _todoItemDeserializeProp,
   idName: r'id',
-  indexes: {},
+  indexes: {
+    r'deadline': IndexSchema(
+      id: -6072942571652605812,
+      name: r'deadline',
+      unique: false,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'deadline',
+          type: IndexType.value,
+          caseSensitive: false,
+        )
+      ],
+    )
+  },
   links: {},
   embeddedSchemas: {},
   getId: _todoItemGetId,
@@ -118,6 +132,14 @@ extension TodoItemQueryWhereSort on QueryBuilder<TodoItem, TodoItem, QWhere> {
       return query.addWhereClause(const IdWhereClause.any());
     });
   }
+
+  QueryBuilder<TodoItem, TodoItem, QAfterWhere> anyDeadline() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        const IndexWhereClause.any(indexName: r'deadline'),
+      );
+    });
+  }
 }
 
 extension TodoItemQueryWhere on QueryBuilder<TodoItem, TodoItem, QWhereClause> {
@@ -181,6 +203,96 @@ extension TodoItemQueryWhere on QueryBuilder<TodoItem, TodoItem, QWhereClause> {
         lower: lowerId,
         includeLower: includeLower,
         upper: upperId,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<TodoItem, TodoItem, QAfterWhereClause> deadlineEqualTo(
+      DateTime deadline) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'deadline',
+        value: [deadline],
+      ));
+    });
+  }
+
+  QueryBuilder<TodoItem, TodoItem, QAfterWhereClause> deadlineNotEqualTo(
+      DateTime deadline) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'deadline',
+              lower: [],
+              upper: [deadline],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'deadline',
+              lower: [deadline],
+              includeLower: false,
+              upper: [],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'deadline',
+              lower: [deadline],
+              includeLower: false,
+              upper: [],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'deadline',
+              lower: [],
+              upper: [deadline],
+              includeUpper: false,
+            ));
+      }
+    });
+  }
+
+  QueryBuilder<TodoItem, TodoItem, QAfterWhereClause> deadlineGreaterThan(
+    DateTime deadline, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'deadline',
+        lower: [deadline],
+        includeLower: include,
+        upper: [],
+      ));
+    });
+  }
+
+  QueryBuilder<TodoItem, TodoItem, QAfterWhereClause> deadlineLessThan(
+    DateTime deadline, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'deadline',
+        lower: [],
+        upper: [deadline],
+        includeUpper: include,
+      ));
+    });
+  }
+
+  QueryBuilder<TodoItem, TodoItem, QAfterWhereClause> deadlineBetween(
+    DateTime lowerDeadline,
+    DateTime upperDeadline, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'deadline',
+        lower: [lowerDeadline],
+        includeLower: includeLower,
+        upper: [upperDeadline],
         includeUpper: includeUpper,
       ));
     });
