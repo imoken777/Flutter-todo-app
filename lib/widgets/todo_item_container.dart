@@ -17,11 +17,13 @@ class TodoItemContainer extends StatefulWidget {
 
 class _TodoItemContainerState extends State<TodoItemContainer> {
   late bool isCompleted;
+  late bool isDeadlinePassed;
 
   @override
   void initState() {
     super.initState();
     isCompleted = widget.todoItem.isCompleted;
+    isDeadlinePassed = widget.todoItem.deadline.isBefore(DateTime.now());
   }
 
   void toggleTodo(Id id) async {
@@ -82,7 +84,7 @@ class _TodoItemContainerState extends State<TodoItemContainer> {
             horizontal: 16,
           ),
           child: Container(
-            height: 80,
+            height: 100,
             width: double.infinity,
             padding: const EdgeInsets.symmetric(
               horizontal: 20,
@@ -91,7 +93,9 @@ class _TodoItemContainerState extends State<TodoItemContainer> {
             decoration: BoxDecoration(
               color: isCompleted
                   ? Colors.green // タスク完了時の色
-                  : const Color.fromARGB(255, 0, 138, 197), // タスク未完了時の色
+                  : isDeadlinePassed
+                      ? Colors.red // 締め切り日を過ぎた場合の色
+                      : const Color.fromARGB(255, 0, 138, 197), //未完了時の色
               borderRadius: const BorderRadius.all(
                 Radius.circular(20),
               ),
@@ -112,10 +116,27 @@ class _TodoItemContainerState extends State<TodoItemContainer> {
                 Text(
                   '締め切り日: ${widget.todoItem.deadline.year}/${widget.todoItem.deadline.month}/${widget.todoItem.deadline.day}',
                   style: const TextStyle(
-                    fontSize: 12,
+                    fontSize: 14,
                     color: Colors.white,
                   ),
-                )
+                ),
+                if (isDeadlinePassed) ...[
+                  const Text(
+                    '締め切り日を過ぎています',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.white,
+                    ),
+                  ),
+                ] else if (isCompleted) ...[
+                  const Text(
+                    'タスクは完了済みです',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
